@@ -1,0 +1,27 @@
+#nav{
+    display:flex;
+    justify-content: space-between;
+    height: 100px;
+    background-color: rgb(31, 133, 216);
+    align-items: center;
+}
+#nav_left{
+    display:flex;
+    align-items: center;
+    
+}
+#nav_left ul{
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    font-size: 1.4rem;
+    color:white;
+}
+#nav_right ul {
+    list-style: none;
+     display: flex;
+     gap: 20px;
+     font-size: 1.4rem;
+     align-items: center;
+     color: white;
+}
