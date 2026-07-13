@@ -1,0 +1,193 @@
+.home{
+    display:flex;
+    flex-direction:column;
+    gap:25px;
+}
+
+.search-section{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+.search-input{
+
+    flex:1;
+
+}
+
+.search-input input{
+
+    width:100%;
+
+    height:55px;
+
+    padding:0 20px;
+
+    border-radius:12px;
+
+    border:1px solid #d1d5db;
+
+    font-size:16px;
+
+    outline:none;
+
+}
+
+.search-input input:focus{
+
+    border-color:#2563eb;
+
+}
+
+.search-section {
+  position: relative;
+}
+
+.filter-menu {
+  position: absolute;
+  top: 55px;
+  right: 110px;
+  width: 220px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+
+  animation: dropdown 0.25s ease;
+}
+
+@keyframes dropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-item {
+  padding: 12px 15px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.filter-btn{
+    padding: 20px 35px;
+    border-radius: 15px;
+}
+
+.filter-item:hover {
+  background: #f3f4f6;
+}
+
+.search-btn{
+
+    width:110px;
+
+    height:55px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#2563eb;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+}
+.search-btn:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+}
+
+.location-section{
+
+    background:white;
+
+    border-radius:12px;
+
+    padding:25px;
+
+}
+
+.location-section h3{
+
+    margin-bottom:10px;
+
+}
+
+.location-section p{
+
+    color:#6b7280;
+
+    margin-bottom:18px;
+
+}
+
+.location-btn{
+
+    padding:12px 22px;
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+}
+
+.map-section{
+
+    height:350px;
+
+    border-radius:12px;
+
+    background:#eef4ff;
+
+    border:1px solid rgb(100, 100, 100);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:24px;
+
+    color:rgb(100, 100, 100);
+
+}
+
+.product-section h2{
+
+    margin-bottom:20px;
+
+}
+
+.product-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:20px;
+
+}

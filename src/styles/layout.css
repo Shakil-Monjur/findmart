@@ -1,0 +1,20 @@
+.customer-layout {
+  min-height: 100vh;
+}
+
+.layout-container {
+  display: flex;
+}
+
+.content {
+  margin-top: 70px;
+  margin-left: 250px;
+
+  width: calc(100% - 250px);
+
+  padding: 25px;
+
+  background: #f5f7fb;
+
+  min-height: calc(100vh - 70px);
+}
