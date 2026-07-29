@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
-import { FaMapMarkerAlt, FaHeart, FaRegHeart } from "react-icons/fa";
-import { useSavedContext } from "../../../context/SavedContext";
-import "./../../../styles/productCard.css";
 
-function ProductCard({ product }) {
-  const { isSaved, toggleSave } = useSavedContext();
-
+function OwnerProductCard({ product, onEdit }) {
   const [user, setUser] = useState(() => {
     try {
       const stored = localStorage.getItem("user");
@@ -28,26 +23,6 @@ function ProductCard({ product }) {
     return () => window.removeEventListener("storage", checkUser);
   }, []);
 
-  const isShopOwner =
-    user?.role === "Shop Owner" || user?.role === "seller" || user?.role === "owner";
-  const isBuyer = !isShopOwner;
-
-  const productId = product?._id || product?.id;
-  const saved = isSaved(productId);
-
-  const handleHeartClick = (e) => {
-    e.stopPropagation();
-    const token = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
-    if (!token && !storedUser) {
-      alert("Please login or sign up first to access this feature.");
-      return;
-    }
-    if (product) {
-      toggleSave(product);
-    }
-  };
-
   const imageSrc = product?.image;
   const title = product?.title || "product photo";
   const sellerName =
@@ -55,6 +30,9 @@ function ProductCard({ product }) {
     product?.seller?.name ||
     product?.owner?.fullName ||
     product?.owner?.name ||
+    user?.fullName ||
+    user?.username ||
+    user?.name ||
     "Shop Name";
 
   const price = product?.price !== undefined ? product.price : 15;
@@ -67,7 +45,10 @@ function ProductCard({ product }) {
     product?.seller?.avatar ||
     product?.owner?.profilePicture ||
     product?.owner?.profilePic ||
-    product?.owner?.avatar;
+    product?.owner?.avatar ||
+    user?.profilePicture ||
+    user?.profilePic ||
+    user?.avatar;
 
   const getSellerAvatarUrl = (url) => {
     if (!url) return defaultSellerAvatar;
@@ -83,37 +64,29 @@ function ProductCard({ product }) {
   const sellerAvatarUrl = getSellerAvatarUrl(rawSellerAvatar);
 
   return (
-    <div className="product-card">
-      <div className="product-photo-box">
-        {isBuyer && (
-          <button
-            className={`heart-btn ${saved ? "saved" : ""}`}
-            onClick={handleHeartClick}
-            title={saved ? "Remove from saved" : "Save product"}
-            aria-label="Save product"
-          >
-            {saved ? (
-              <FaHeart className="heart-icon filled" />
-            ) : (
-              <FaRegHeart className="heart-icon outline" />
-            )}
-          </button>
-        )}
-
+    <div className="owner-product-card">
+      <div className="owner-photo-box">
         {imageSrc ? (
           <img
             src={imageSrc}
             alt={title}
-            className="product-image"
+            className="owner-image"
             style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "12px" }}
           />
         ) : (
           <span>{title}</span>
         )}
+        <span
+          className="edit-icon-text"
+          onClick={() => onEdit && onEdit(product)}
+          style={{ cursor: "pointer" }}
+        >
+          Edit
+        </span>
       </div>
 
-      <div className="product-card-body">
-        <div className="product-card-middle">
+      <div className="owner-card-body">
+        <div className="owner-card-middle">
           <div className="shop-info-left">
             <img
               src={sellerAvatarUrl}
@@ -134,14 +107,9 @@ function ProductCard({ product }) {
         </div>
 
         <p className="product-description">{description}</p>
-
-        <div className="product-card-footer">
-          <span>500 m Away</span>
-          <FaMapMarkerAlt className="distance-icon" />
-        </div>
       </div>
     </div>
   );
 }
 
-export default ProductCard;
+export default OwnerProductCard;

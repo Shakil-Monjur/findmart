@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createHashRouter } from "react-router-dom";
 
 // Layouts
 import CustomerLayout from "../layouts/CustomerLayout";
@@ -16,7 +16,10 @@ import Settings from "../pages/customer/Settings";
 import Login from "../pages/customer/Login";
 import Signup from "../pages/customer/Signup";
 
+import ProtectedRoute from "../components/ProtectedRoute";
+
 // Shop Owner Pages
+import ShopDashboard from "../pages/shopOwner/ShopDashboard";
 import Dashboard from "../pages/shopOwner/Dashboard";
 import Products from "../pages/shopOwner/Products";
 import AddProduct from "../pages/shopOwner/AddProduct";
@@ -26,7 +29,7 @@ import Sales from "../pages/shopOwner/Sales";
 import ProfileOwner from "../pages/shopOwner/Profile";
 import SettingsOwner from "../pages/shopOwner/Settings";
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   // ==========================
   // Customer Routes
   // ==========================
@@ -76,13 +79,31 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "/shop-dashboard",
+    element: (
+      <ProtectedRoute>
+        <ShopOwnerLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+    ],
+  },
 
   // ==========================
   // Shop Owner Routes
   // ==========================
   {
     path: "/shop-owner",
-    element: <ShopOwnerLayout />,
+    element: (
+      <ProtectedRoute>
+        <ShopOwnerLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,

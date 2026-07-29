@@ -1,9 +1,3 @@
-function Profile() {
-  return (
-    <div>
-      <h1>Product Details Page</h1>
-    </div>
-  );
-}
+import Profile from "../customer/Profile";
 
 export default Profile;

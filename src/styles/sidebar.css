@@ -1,84 +1,111 @@
 .sidebar {
-  position: fixed;
-  top: 70px;
-  left: 0;
-  width: 250px;
-  height: calc(100vh - 70px);
+  position: sticky;
+  top: 94px;
+  width: 260px;
+  min-width: 260px;
+  height: calc(100vh - 118px);
   background: white;
-  border-right: 1px solid #e5e7eb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   padding: 20px;
   overflow-y: auto;
 }
 
-.sidebar-menu {
-  list-style-type: none;
-  margin-bottom: 30px;
+.sidebar-search {
+  margin-bottom: 24px;
 }
 
-.sidebar-menu li {
+.sidebar-search-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  color: #374151;
+  box-sizing: border-box;
+  background: #ffffff;
+  transition: border-color 0.2s ease;
+}
+
+.sidebar-search-input:focus {
+  border-color: #2563eb;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebar-menu li a {
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 30px;
+  gap: 12px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.sidebar-menu li a:hover,
+.sidebar-menu li a.active {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.icon-box {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #374151;
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.sidebar-menu li a:hover .icon-box,
+.sidebar-menu li a.active .icon-box {
+  background: #1d4ed8;
+}
+
+.sidebar-gap {
+  margin-top: 36px;
 }
 
 .sidebar-footer {
   margin-top: auto;
+  padding-top: 20px;
 }
 
-
-.sidebar-menu-item {
+.shop-owner-btn {
   display: flex;
   align-items: center;
-  gap: 15px;
-  text-decoration: none;
+  justify-content: center;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   color: #1d4ed8;
-  padding: 14px 19px;
-  border: 1px solid rgb(141, 141, 141);
-  border-radius: 5px;
-  margin-right: 30px;
-  background: white;
-  transition: 0.3s;
-}
-
-.sidebar-menu-item:hover,
-.sidebar-menu-item.active {
-  background: #1d4ed8;
-  color: white;
-  border-color: #1d4ed8;
-}
-
-.sidebar-menu li a {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  width: 100%;
-  padding: 10px 0;
-  color: #374151;
+  font-weight: 500;
+  font-size: 14px;
   text-decoration: none;
-  transition: 0.3s;
+  background: white;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
-.sidebar-menu li a:hover {
-  color: #2563eb;
-}
-
-.sidebar-menu li a.active {
-  color: #2563eb;
-  font-weight: 600;
-}
-
-.sidebar-menu li a {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  color: var(--text);
-  width: 100%;
-}
-
-.sidebar-menu li a.active {
-  color: #2563eb;
-  font-weight: 600;
-}
+.shop-owner-btn:hover {
+  background: #f8fafc;
+  border-color: #1d4ed8;
+}

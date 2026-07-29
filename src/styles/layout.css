@@ -1,20 +1,55 @@
 .customer-layout {
   min-height: 100vh;
+  background: #f5f7fb;
 }
 
 .layout-container {
   display: flex;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  padding-top: 94px;
+  gap: 24px;
 }
 
 .content {
-  margin-top: 70px;
-  margin-left: 250px;
-
-  width: calc(100% - 250px);
-
-  padding: 25px;
-
-  background: #f5f7fb;
-
-  min-height: calc(100vh - 70px);
+  flex: 1;
+  min-width: 0;
 }
+
+/* Global Top Navigation Tabs */
+.main-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 24px;
+  gap: 24px;
+}
+
+.tab-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 46px;
+  border-radius: 8px;
+  background-color: #e5e7eb; /* Darker gray background matching hover state */
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.tab-item:hover {
+  background-color: #d1d5db;
+}
+
+.tab-item.active {
+  background-color: #1d4ed8;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+
