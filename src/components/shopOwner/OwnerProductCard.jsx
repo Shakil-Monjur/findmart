@@ -56,9 +56,9 @@ function OwnerProductCard({ product, onEdit }) {
       return url;
     }
     if (url.startsWith("/")) {
-      return `http://localhost:5000${url}`;
+      return `https://findmart.onrender.com${url}`;
     }
-    return `http://localhost:5000/${url}`;
+    return `https://findmart.onrender.com/${url}`;
   };
 
   const sellerAvatarUrl = getSellerAvatarUrl(rawSellerAvatar);

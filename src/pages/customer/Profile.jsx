@@ -42,7 +42,7 @@ function Profile() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/users/update-profile-picture", {
+      const res = await fetch("https://findmart.onrender.com/api/users/update-profile-picture", {
         method: "POST",
         body: formData,
       });

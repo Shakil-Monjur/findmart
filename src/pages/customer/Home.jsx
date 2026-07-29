@@ -30,7 +30,7 @@ function Home() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch("https://findmart.onrender.com/api/products");
         if (res.ok) {
           const data = await res.json();
           setProducts(data);

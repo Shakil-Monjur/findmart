@@ -29,12 +29,12 @@ function Dashboard() {
       const user = JSON.parse(storedUser);
       const userId = user._id || user.id;
 
-      const res = await fetch(`http://localhost:5000/api/products/seller/${userId}`);
+      const res = await fetch(`https://findmart.onrender.com/api/products/seller/${userId}`);
       if (res.ok) {
         const data = await res.json();
         setProducts(data);
       } else {
-        const fallbackRes = await fetch("http://localhost:5000/api/products");
+        const fallbackRes = await fetch("https://findmart.onrender.com/api/products");
         if (fallbackRes.ok) {
           const allData = await fallbackRes.json();
           const userProducts = allData.filter(
@@ -63,7 +63,7 @@ function Dashboard() {
       const user = storedUser ? JSON.parse(storedUser) : null;
       const sellerId = user?._id || user?.id;
 
-      const res = await fetch("http://localhost:5000/api/products", {
+      const res = await fetch("https://findmart.onrender.com/api/products", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +114,7 @@ function Dashboard() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:5000/api/products/${editingProduct._id}`, {
+      const res = await fetch(`https://findmart.onrender.com/api/products/${editingProduct._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
