@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaTrash, FaPlus, FaMinus, FaShoppingBag, FaArrowRight } from "react-icons/fa";
 import { useCartContext } from "../../context/CartContext";
 import "../../styles/cart.css";
 
 function Cart() {
+  const navigate = useNavigate();
   const {
     cartItems,
     removeFromCart,
@@ -26,7 +27,7 @@ function Cart() {
   };
 
   const handleCheckout = () => {
-    alert(`Proceeding to checkout with total amount: $${totalPrice.toFixed(2)}`);
+    navigate("/checkout");
   };
 
   if (cartItems.length === 0) {

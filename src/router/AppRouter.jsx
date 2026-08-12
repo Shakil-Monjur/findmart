@@ -8,8 +8,10 @@ import ShopOwnerLayout from "../layouts/ShopOwnerLayout";
 import Home from "../pages/customer/Home";
 import Location from "../pages/customer/Location";
 import Cart from "../pages/customer/Cart";
+import Checkout from "../pages/customer/Checkout";
 import Saved from "../pages/customer/Saved";
 import Orders from "../pages/customer/Orders";
+import OrderHistory from "../pages/customer/OrderHistory";
 import ProductDetails from "../pages/customer/ProductDetails";
 import Profile from "../pages/customer/Profile";
 import Settings from "../pages/customer/Settings";
@@ -50,12 +52,20 @@ const router = createHashRouter([
         element: <Cart />,
       },
       {
+        path: "checkout",
+        element: <Checkout />,
+      },
+      {
         path: "saved",
         element: <Saved />,
       },
       {
         path: "orders",
         element: <Orders />,
+      },
+      {
+        path: "order-history",
+        element: <OrderHistory />,
       },
       {
         path: "product/:id",

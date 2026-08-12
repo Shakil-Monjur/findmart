@@ -1,9 +1,7 @@
+import OrderHistory from "./OrderHistory";
+
 function Orders() {
-  return (
-    <div>
-      <h1>Order Page</h1>
-    </div>
-  );
+  return <OrderHistory />;
 }
 
 export default Orders;
