@@ -1,12 +1,15 @@
 
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FaShoppingCart } from "react-icons/fa";
 import { useAuthContext } from "../../context/AuthContext";
+import { useCartContext } from "../../context/CartContext";
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isLoggedIn, logout } = useAuthContext();
+  const { totalUniqueItems } = useCartContext();
 
   const isShopOwner =
     user?.role === "Shop Owner" ||
@@ -45,7 +48,51 @@ function Navbar() {
           {isShopOwner && <span className="shop-owner-title">Shop Owner</span>}
         </div>
 
-        <div className="nav-right">
+        <div className="nav-right" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {!isShopOwner && (
+            <Link
+              to="/cart"
+              className="navbar-cart-link"
+              title="Shopping Cart"
+              style={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#374151",
+                fontSize: "20px",
+                textDecoration: "none",
+                padding: "6px",
+                borderRadius: "50%",
+              }}
+            >
+              <FaShoppingCart />
+              {totalUniqueItems > 0 && (
+                <span
+                  className="navbar-cart-badge"
+                  style={{
+                    position: "absolute",
+                    top: "-4px",
+                    right: "-6px",
+                    background: "#2563eb",
+                    color: "#ffffff",
+                    fontSize: "11px",
+                    fontWeight: "700",
+                    width: "18px",
+                    height: "18px",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 2px 4px rgba(37, 99, 235, 0.3)",
+                  }}
+                >
+                  {totalUniqueItems}
+                </span>
+              )}
+            </Link>
+          )}
+
           {isLoggedIn && user ? (
             <div className="user-profile-section" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
               <img

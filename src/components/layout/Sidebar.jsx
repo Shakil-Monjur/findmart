@@ -14,10 +14,12 @@ import {
 import "./../../styles/sidebar.css";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthContext";
+import { useCartContext } from "../../context/CartContext";
 
 function Sidebar({ role }) {
   const location = useLocation();
   const { user, isLoggedIn } = useAuthContext();
+  const { totalUniqueItems } = useCartContext();
 
   const isShopOwner =
     role === "owner" ||
@@ -94,6 +96,21 @@ function Sidebar({ role }) {
                 {item.icon}
               </span>
               <span>{item.label}</span>
+              {item.label === "Cart" && totalUniqueItems > 0 && (
+                <span
+                  style={{
+                    marginLeft: "auto",
+                    background: "#2563eb",
+                    color: "#ffffff",
+                    fontSize: "11px",
+                    fontWeight: "700",
+                    borderRadius: "10px",
+                    padding: "2px 7px",
+                  }}
+                >
+                  {totalUniqueItems}
+                </span>
+              )}
             </NavLink>
           </li>
         ))}

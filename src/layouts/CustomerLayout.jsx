@@ -5,7 +5,11 @@ import Sidebar from "../components/layout/Sidebar";
 
 import "../styles/layout.css";
 
+import { useCartContext } from "../context/CartContext";
+
 function CustomerLayout() {
+  const { totalUniqueItems } = useCartContext();
+
   return (
     <div className="customer-layout">
 
@@ -22,7 +26,7 @@ function CustomerLayout() {
               Home
             </NavLink>
             <NavLink to="/cart" className={({ isActive }) => (isActive ? "tab-item active" : "tab-item")}>
-              Cart
+              Cart {totalUniqueItems > 0 ? `(${totalUniqueItems})` : ""}
             </NavLink>
             <NavLink to="/saved" className={({ isActive }) => (isActive ? "tab-item active" : "tab-item")}>
               Saved

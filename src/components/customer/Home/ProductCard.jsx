@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
-import { FaMapMarkerAlt, FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaMapMarkerAlt, FaHeart, FaRegHeart, FaShoppingCart, FaCheck } from "react-icons/fa";
 import { useSavedContext } from "../../../context/SavedContext";
+import { useCartContext } from "../../../context/CartContext";
 import "./../../../styles/productCard.css";
 
 function ProductCard({ product }) {
   const { isSaved, toggleSave } = useSavedContext();
+  const { addToCart } = useCartContext();
+  const [added, setAdded] = useState(false);
 
   const [user, setUser] = useState(() => {
     try {
@@ -45,6 +48,15 @@ function ProductCard({ product }) {
     }
     if (product) {
       toggleSave(product);
+    }
+  };
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    if (product) {
+      addToCart(product);
+      setAdded(true);
+      setTimeout(() => setAdded(false), 1800);
     }
   };
 
@@ -145,6 +157,21 @@ function ProductCard({ product }) {
         </div>
 
         <p className="product-description">{description}</p>
+
+        <button
+          className={`add-to-cart-btn ${added ? "added" : ""}`}
+          onClick={handleAddToCart}
+        >
+          {added ? (
+            <>
+              <FaCheck style={{ marginRight: "6px" }} /> Added to Cart!
+            </>
+          ) : (
+            <>
+              <FaShoppingCart style={{ marginRight: "6px" }} /> Add to Cart
+            </>
+          )}
+        </button>
 
         <div className="product-card-footer">
           <span>500 m Away</span>
