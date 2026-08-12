@@ -1,9 +1,7 @@
+import Profile from "../customer/Profile";
+
 function Settings() {
-  return (
-    <div>
-      <h1>Product Details Page</h1>
-    </div>
-  );
+  return <Profile />;
 }
 
 export default Settings;

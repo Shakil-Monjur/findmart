@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import OwnerProductCard from "../../components/shopOwner/OwnerProductCard";
+import { API_BASE_URL } from "../../services/api";
 import "../../styles/shopOwner.css";
 
 function Dashboard() {
@@ -29,12 +30,12 @@ function Dashboard() {
       const user = JSON.parse(storedUser);
       const userId = user._id || user.id;
 
-      const res = await fetch(`https://findmart.onrender.com/api/products/seller/${userId}`);
+      const res = await fetch(`${API_BASE_URL}/products/seller/${userId}`);
       if (res.ok) {
         const data = await res.json();
         setProducts(data);
       } else {
-        const fallbackRes = await fetch("https://findmart.onrender.com/api/products");
+        const fallbackRes = await fetch(`${API_BASE_URL}/products`);
         if (fallbackRes.ok) {
           const allData = await fallbackRes.json();
           const userProducts = allData.filter(
@@ -63,7 +64,7 @@ function Dashboard() {
       const user = storedUser ? JSON.parse(storedUser) : null;
       const sellerId = user?._id || user?.id;
 
-      const res = await fetch("https://findmart.onrender.com/api/products", {
+      const res = await fetch(`${API_BASE_URL}/products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +115,7 @@ function Dashboard() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`https://findmart.onrender.com/api/products/${editingProduct._id}`, {
+      const res = await fetch(`${API_BASE_URL}/products/${editingProduct._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

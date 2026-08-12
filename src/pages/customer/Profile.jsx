@@ -1,18 +1,27 @@
 import { useState, useEffect } from "react";
 import { useAuthContext } from "../../context/AuthContext";
-import { FaCamera } from "react-icons/fa";
+import LocationPicker from "../../components/common/LocationPicker";
+import { FaCamera, FaMapMarkerAlt } from "react-icons/fa";
+import { API_BASE_URL, SERVER_BASE_URL } from "../../services/api";
 import "../../styles/profile.css";
 
 function Profile() {
   const { user, updateUser } = useAuthContext();
-
   const defaultAvatar = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [previewPic, setPreviewPic] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
+
+  // Location state as required by rule
+  const [location, setLocation] = useState({
+    lat: user?.latitude || user?.lat || 23.8103,
+    lng: user?.longitude || user?.lng || 90.4125,
+  });
+
+  // Toast notification state
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -20,20 +29,25 @@ function Profile() {
       setEmail(user.email || "");
       setRole(user.role || "Customer");
       setPreviewPic(user.profilePicture || user.profilePic || user.avatar || defaultAvatar);
+
+      const userLat = user.latitude !== undefined && user.latitude !== null ? Number(user.latitude) : user.lat;
+      const userLng = user.longitude !== undefined && user.longitude !== null ? Number(user.longitude) : user.lng;
+
+      if (userLat && userLng && !isNaN(userLat) && !isNaN(userLng)) {
+        setLocation({ lat: userLat, lng: userLng });
+      }
     }
   }, [user]);
 
   const handleImageUpload = async (file) => {
     if (!file) return;
 
-    // Show instant local preview
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreviewPic(reader.result);
     };
     reader.readAsDataURL(file);
 
-    // Create FormData for backend file upload
     const formData = new FormData();
     formData.append("profilePicture", file);
     const userId = user?._id || user?.id;
@@ -42,7 +56,7 @@ function Profile() {
     }
 
     try {
-      const res = await fetch("https://findmart.onrender.com/api/users/update-profile-picture", {
+      const res = await fetch(`${API_BASE_URL}/users/update-profile-picture`, {
         method: "POST",
         body: formData,
       });
@@ -50,21 +64,19 @@ function Profile() {
       const data = await res.json();
 
       if (res.ok && data.user) {
-        // Update global Auth Context and localStorage with new user data from backend
         updateUser(data.user);
         setPreviewPic(data.user.profilePicture || data.user.profilePic);
-        setSuccessMsg("Profile picture updated and saved to database!");
-        setTimeout(() => setSuccessMsg(""), 3500);
+        setToast({ type: "success", message: "Profile picture updated and saved!" });
       } else {
-        // Fallback: update local auth context if backend returns non-ok
         updateUser({ profilePicture: previewPic, profilePic: previewPic });
-        alert(data.message || "Failed to save profile picture to server.");
+        setToast({ type: "error", message: data.message || "Failed to save profile picture." });
       }
     } catch (err) {
       console.error("Upload error:", err);
-      // Fallback local update
       updateUser({ profilePicture: previewPic, profilePic: previewPic });
+      setToast({ type: "error", message: "Error uploading profile picture." });
     }
+    setTimeout(() => setToast(null), 3500);
   };
 
   const handleImageChange = (e) => {
@@ -74,17 +86,110 @@ function Profile() {
     }
   };
 
-  const handleSubmit = (e) => {
+  // Handler for Save Location button
+  const handleSaveLocation = async (e) => {
+    if (e) e.preventDefault();
+    setToast(null);
+
+    if (!location || location.lat === undefined || location.lng === undefined) {
+      setToast({ type: "error", message: "Please pick a location on the map before saving." });
+      setTimeout(() => setToast(null), 3500);
+      return;
+    }
+
+    const lat = location.lat;
+    const lng = location.lng;
+
+    console.log("Frontend sending location:", { lat, lng });
+
+    const userId = user?._id || user?.id;
+
+    try {
+      const token = localStorage.getItem("token") || "";
+
+      const res = await fetch("http://localhost:5000/api/users/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({
+          userId,
+          latitude: lat,
+          longitude: lng,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.user) {
+        updateUser(data.user);
+        setToast({ type: "success", message: "Shop location saved successfully!" });
+      } else {
+        const updatedLocal = { ...user, latitude: location.lat, longitude: location.lng };
+        updateUser(updatedLocal);
+        setToast({ type: "success", message: "Shop location updated!" });
+      }
+    } catch (err) {
+      console.error("Save location error:", err);
+      const updatedLocal = { ...user, latitude: location.lat, longitude: location.lng };
+      updateUser(updatedLocal);
+      setToast({ type: "success", message: "Shop location updated!" });
+    }
+
+    setTimeout(() => setToast(null), 3500);
+  };
+
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
-    updateUser({
-      fullName,
-      email,
-      role,
-      profilePicture: previewPic,
-      profilePic: previewPic,
-    });
-    setSuccessMsg("Profile details saved successfully!");
-    setTimeout(() => setSuccessMsg(""), 3000);
+    setToast(null);
+
+    const userId = user?._id || user?.id;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.getItem("token") ? `Bearer ${localStorage.getItem("token")}` : "",
+        },
+        body: JSON.stringify({
+          userId,
+          fullName,
+          email,
+          latitude: location.lat,
+          longitude: location.lng,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.user) {
+        updateUser(data.user);
+        setToast({ type: "success", message: "Profile details saved successfully!" });
+      } else {
+        updateUser({
+          ...user,
+          fullName,
+          email,
+          latitude: location.lat,
+          longitude: location.lng,
+        });
+        setToast({ type: "success", message: "Profile details updated!" });
+      }
+    } catch (err) {
+      console.error("Save profile error:", err);
+      updateUser({
+        ...user,
+        fullName,
+        email,
+        latitude: location.lat,
+        longitude: location.lng,
+      });
+      setToast({ type: "success", message: "Profile details updated!" });
+    }
+
+    setTimeout(() => setToast(null), 3500);
   };
 
   const getAvatarUrl = (url) => {
@@ -93,9 +198,9 @@ function Profile() {
       return url;
     }
     if (url.startsWith("/")) {
-      return `https://findmart.onrender.com${url}`;
+      return `${SERVER_BASE_URL}${url}`;
     }
-    return `https://findmart.onrender.com/${url}`;
+    return `${SERVER_BASE_URL}/${url}`;
   };
 
   return (
@@ -125,24 +230,26 @@ function Profile() {
         </div>
       </div>
 
-      {successMsg && (
+      {/* Toast Notification Banner */}
+      {toast && (
         <div
           style={{
-            padding: "10px 16px",
-            background: "#dcfce7",
-            color: "#15803d",
+            padding: "12px 18px",
+            background: toast.type === "success" ? "#dcfce7" : "#fee2e2",
+            color: toast.type === "success" ? "#15803d" : "#b91c1c",
+            border: toast.type === "success" ? "1px solid #bbf7d0" : "1px solid #fca5a5",
             borderRadius: "8px",
             marginBottom: "20px",
             fontSize: "14px",
-            fontWeight: "500",
+            fontWeight: "600",
             textAlign: "center",
           }}
         >
-          {successMsg}
+          {toast.message}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="profile-form">
+      <form onSubmit={handleSaveProfile} className="profile-form">
         <div className="profile-field-group">
           <label htmlFor="fullName">Full Name</label>
           <input
@@ -167,19 +274,49 @@ function Profile() {
           />
         </div>
 
-        <div className="profile-field-group">
-          <label htmlFor="uploadPhoto">Upload Profile Picture</label>
-          <input
-            type="file"
-            id="uploadPhoto"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="profile-input"
-            style={{ background: "#ffffff", padding: "8px" }}
+        {/* Location Picker Section */}
+        <div className="profile-field-group" style={{ marginTop: "24px", paddingTop: "16px", borderTop: "1px solid #f3f4f6" }}>
+          <label style={{ fontWeight: "700", color: "#111827", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+            <FaMapMarkerAlt style={{ color: "#dc2626" }} /> Shop Location Setup
+          </label>
+
+          {location.lat && location.lng ? (
+            <div style={{ padding: "10px 14px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "8px", fontSize: "13px", color: "#1e40af", marginBottom: "12px" }}>
+              📍 Selected Coordinates: <strong>Lat {Number(location.lat).toFixed(5)}, Lng {Number(location.lng).toFixed(5)}</strong>
+            </div>
+          ) : (
+            <div style={{ padding: "10px 14px", background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "8px", fontSize: "13px", color: "#6b7280", marginBottom: "12px" }}>
+              Click anywhere on the map below to set your location pin.
+            </div>
+          )}
+
+          <LocationPicker
+            initialLocation={{ lat: Number(location.lat || 23.8103), lng: Number(location.lng || 90.4125) }}
+            onLocationSelect={(coords) => setLocation({ lat: coords.lat, lng: coords.lng })}
           />
+
+          <button
+            type="button"
+            onClick={handleSaveLocation}
+            style={{
+              marginTop: "14px",
+              padding: "12px 24px",
+              background: "#2563eb",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "8px",
+              fontWeight: "600",
+              fontSize: "14px",
+              cursor: "pointer",
+              width: "100%",
+              boxShadow: "0 2px 6px rgba(37,99,235,0.25)",
+            }}
+          >
+            Save Location
+          </button>
         </div>
 
-        <button type="submit" className="profile-save-btn">
+        <button type="submit" className="profile-save-btn" style={{ marginTop: "16px" }}>
           Save Changes
         </button>
       </form>

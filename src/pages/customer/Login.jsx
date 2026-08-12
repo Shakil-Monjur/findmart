@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthContext";
+import { API_BASE_URL } from "../../services/api";
 import "../../styles/auth.css";
 
 function Login() {
@@ -14,7 +15,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch("https://findmart.onrender.com/api/auth/login", {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

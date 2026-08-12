@@ -3,19 +3,21 @@ import { useNavigate, Link } from "react-router-dom";
 import { FaMapMarkerAlt, FaCreditCard, FaLock, FaArrowLeft } from "react-icons/fa";
 import { useCartContext } from "../../context/CartContext";
 import { useAuthContext } from "../../context/AuthContext";
+import { API_BASE_URL, SERVER_BASE_URL } from "../../services/api";
 import "../../styles/checkout.css";
 
 function Checkout() {
   const navigate = useNavigate();
-  const { cartItems, totalPrice, clearCart } = useCartContext();
+  const { cartItems, cartTotal, clearCart } = useCartContext();
   const { user } = useAuthContext();
+  const totalPrice = cartTotal;
 
-  const [fullName, setFullName] = useState(user?.fullName || user?.name || "");
+  const [fullName, setFullName] = useState(user?.fullName || "");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [phone, setPhone] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
+  const [paymentMethod, setPaymentMethod] = useState("cod");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -25,9 +27,9 @@ function Checkout() {
       return url;
     }
     if (url.startsWith("/")) {
-      return `https://findmart.onrender.com${url}`;
+      return `${SERVER_BASE_URL}${url}`;
     }
-    return `https://findmart.onrender.com/${url}`;
+    return `${SERVER_BASE_URL}/${url}`;
   };
 
   const handlePlaceOrder = async (e) => {
@@ -74,7 +76,7 @@ function Checkout() {
         },
       };
 
-      const res = await fetch("https://findmart.onrender.com/api/orders", {
+      const res = await fetch(`${API_BASE_URL}/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,6 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const Product = require("../models/Product");
+const User = require("../models/User");
 
 const { upload } = require("../middleware/upload");
 
@@ -36,10 +37,21 @@ const authMiddleware = (req, res, next) => {
 router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
   try {
     const { title, description, price, image } = req.body;
-    const seller = req.user?.id || req.body.seller || req.body.sellerId;
+    const sellerId = req.user?.id || req.body.seller || req.body.sellerId;
 
-    if (!seller) {
+    if (!sellerId) {
       return res.status(401).json({ message: "Seller authentication required" });
+    }
+
+    const sellerUser = await User.findById(sellerId);
+    if (
+      !sellerUser ||
+      sellerUser.latitude === undefined ||
+      sellerUser.latitude === null ||
+      sellerUser.longitude === undefined ||
+      sellerUser.longitude === null
+    ) {
+      return res.status(400).json({ message: "Shop location must be set before adding products." });
     }
 
     if (!title || !description || price === undefined) {
@@ -49,7 +61,7 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
     const imageUrl = req.file ? req.file.path : (image || "");
 
     const newProduct = new Product({
-      seller,
+      seller: sellerId,
       title,
       description,
       price: Number(price),
@@ -57,9 +69,12 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
     });
 
     const savedProduct = await newProduct.save();
-    const populatedProduct = await savedProduct.populate("seller", "fullName email role profilePicture");
+    const populatedProduct = await savedProduct.populate("seller", "fullName name email role profilePicture avatar latitude longitude");
 
-    return res.status(201).json(populatedProduct);
+    const result = populatedProduct.toObject();
+    result.owner = result.seller;
+
+    return res.status(201).json(result);
   } catch (error) {
     console.error("Error creating product:", error);
     return res.status(500).json({ message: error.message });
@@ -72,9 +87,20 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const products = await Product.find()
-      .populate("seller", "fullName email role profilePicture")
+      .populate("seller", "fullName name email role profilePicture avatar latitude longitude")
       .sort({ createdAt: -1 });
-    return res.status(200).json(products);
+
+    const formattedProducts = products.map((p) => {
+      const doc = p.toObject();
+      if (doc.seller && !doc.owner) {
+        doc.owner = doc.seller;
+      }
+      return doc;
+    });
+
+    console.log("DEBUG BACKEND - Product 0 Owner/Seller Data:", formattedProducts[0]?.owner || formattedProducts[0]?.seller || products[0]?.seller);
+
+    return res.status(200).json(formattedProducts);
   } catch (error) {
     console.error("Error fetching products:", error);
     return res.status(500).json({ message: error.message });
@@ -88,9 +114,18 @@ router.get("/seller/:sellerId", async (req, res) => {
   try {
     const { sellerId } = req.params;
     const products = await Product.find({ seller: sellerId })
-      .populate("seller", "fullName email role profilePicture")
+      .populate("seller", "fullName name email role profilePicture avatar latitude longitude")
       .sort({ createdAt: -1 });
-    return res.status(200).json(products);
+
+    const formattedProducts = products.map((p) => {
+      const doc = p.toObject();
+      if (doc.seller && !doc.owner) {
+        doc.owner = doc.seller;
+      }
+      return doc;
+    });
+
+    return res.status(200).json(formattedProducts);
   } catch (error) {
     console.error("Error fetching seller products:", error);
     return res.status(500).json({ message: error.message });
@@ -119,9 +154,12 @@ router.put("/:id", authMiddleware, upload.single("image"), async (req, res) => {
     }
 
     const updatedProduct = await product.save();
-    const populatedProduct = await updatedProduct.populate("seller", "fullName email role profilePicture");
+    const populatedProduct = await updatedProduct.populate("seller", "fullName name email role profilePicture avatar latitude longitude");
 
-    return res.status(200).json(populatedProduct);
+    const result = populatedProduct.toObject();
+    result.owner = result.seller;
+
+    return res.status(200).json(result);
   } catch (error) {
     console.error("Error updating product:", error);
     return res.status(500).json({ message: error.message });

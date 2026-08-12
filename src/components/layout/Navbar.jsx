@@ -1,20 +1,16 @@
-
-
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaShoppingCart } from "react-icons/fa";
 import { useAuthContext } from "../../context/AuthContext";
 import { useCartContext } from "../../context/CartContext";
+import { SERVER_BASE_URL } from "../../services/api";
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isLoggedIn, logout } = useAuthContext();
-  const { totalUniqueItems } = useCartContext();
 
-  const isShopOwner =
-    user?.role === "Shop Owner" ||
-    location.pathname.startsWith("/shop-owner") ||
-    location.pathname.startsWith("/shop-dashboard");
+  const { user, isShopOwner, logout } = useAuthContext();
+  const { cartItems } = useCartContext();
+  const totalUniqueItems = cartItems.length;
 
   const handleLogout = () => {
     logout();
@@ -31,9 +27,9 @@ function Navbar() {
       return url;
     }
     if (url.startsWith("/")) {
-      return `https://findmart.onrender.com${url}`;
+      return `${SERVER_BASE_URL}${url}`;
     }
-    return `https://findmart.onrender.com/${url}`;
+    return `${SERVER_BASE_URL}/${url}`;
   };
 
   const avatarUrl = getAvatarUrl(rawAvatar);

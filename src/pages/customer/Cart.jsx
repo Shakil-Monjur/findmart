@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { FaTrash, FaPlus, FaMinus, FaShoppingBag, FaArrowRight } from "react-icons/fa";
 import { useCartContext } from "../../context/CartContext";
+import { SERVER_BASE_URL } from "../../services/api";
 import "../../styles/cart.css";
 
 function Cart() {
@@ -8,11 +9,10 @@ function Cart() {
   const {
     cartItems,
     removeFromCart,
-    increaseQuantity,
-    decreaseQuantity,
-    clearCart,
-    totalPrice,
+    updateQuantity,
+    cartTotal,
     totalUniqueItems,
+    clearCart,
   } = useCartContext();
 
   const getImageUrl = (url) => {
@@ -21,9 +21,9 @@ function Cart() {
       return url;
     }
     if (url.startsWith("/")) {
-      return `https://findmart.onrender.com${url}`;
+      return `${SERVER_BASE_URL}${url}`;
     }
-    return `https://findmart.onrender.com/${url}`;
+    return `${SERVER_BASE_URL}/${url}`;
   };
 
   const handleCheckout = () => {

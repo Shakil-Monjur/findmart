@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { SERVER_BASE_URL } from "../../services/api";
 
 function OwnerProductCard({ product, onEdit }) {
   const [user, setUser] = useState(() => {
@@ -29,9 +30,9 @@ function OwnerProductCard({ product, onEdit }) {
       return url;
     }
     if (url.startsWith("/")) {
-      return `https://findmart.onrender.com${url}`;
+      return `${SERVER_BASE_URL}${url}`;
     }
-    return `https://findmart.onrender.com/${url}`;
+    return `${SERVER_BASE_URL}/${url}`;
   };
 
   const imageSrc = getImageUrl(product?.image);
@@ -67,9 +68,9 @@ function OwnerProductCard({ product, onEdit }) {
       return url;
     }
     if (url.startsWith("/")) {
-      return `https://findmart.onrender.com${url}`;
+      return `${SERVER_BASE_URL}${url}`;
     }
-    return `https://findmart.onrender.com/${url}`;
+    return `${SERVER_BASE_URL}/${url}`;
   };
 
   const sellerAvatarUrl = getSellerAvatarUrl(rawSellerAvatar);

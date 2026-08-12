@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../services/api";
 import "../../styles/auth.css";
 
 function Signup() {
@@ -19,7 +20,7 @@ function Signup() {
     }
 
     try {
-      const res = await fetch("https://findmart.onrender.com/api/auth/signup", {
+      const res = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

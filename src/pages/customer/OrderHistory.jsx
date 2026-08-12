@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaBoxOpen, FaClock, FaCheckCircle, FaTruck, FaBan } from "react-icons/fa";
+import { API_BASE_URL, SERVER_BASE_URL } from "../../services/api";
 import "../../styles/orders.css";
 
 function OrderHistory() {
@@ -13,9 +14,9 @@ function OrderHistory() {
       return url;
     }
     if (url.startsWith("/")) {
-      return `https://findmart.onrender.com${url}`;
+      return `${SERVER_BASE_URL}${url}`;
     }
-    return `https://findmart.onrender.com/${url}`;
+    return `${SERVER_BASE_URL}/${url}`;
   };
 
   useEffect(() => {
@@ -26,7 +27,7 @@ function OrderHistory() {
         const user = storedUser ? JSON.parse(storedUser) : null;
         const buyerId = user?._id || user?.id;
 
-        const res = await fetch(`https://findmart.onrender.com/api/orders/myorders?buyerId=${buyerId || ""}`, {
+        const res = await fetch(`${API_BASE_URL}/orders/myorders?buyerId=${buyerId || ""}`, {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
             "x-user-id": buyerId || "",

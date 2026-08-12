@@ -34,7 +34,7 @@ const upload = multer({ storage });
 // @access  Public
 router.post("/signup", async (req, res) => {
   try {
-    const { fullName, email, password, role } = req.body;
+    const { fullName, email, password, role, latitude, longitude, lat, lng } = req.body;
 
     if (!fullName || !email || !password || !role) {
       return res.status(400).json({ message: "Please provide all required fields" });
@@ -45,11 +45,16 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ message: "User already exists with this email" });
     }
 
+    const finalLat = latitude !== undefined && latitude !== null ? latitude : lat;
+    const finalLng = longitude !== undefined && longitude !== null ? longitude : lng;
+
     const user = new User({
       fullName,
       email,
       password,
       role,
+      latitude: finalLat ? Number(finalLat) : null,
+      longitude: finalLng ? Number(finalLng) : null,
     });
 
     await user.save();
@@ -71,6 +76,8 @@ router.post("/signup", async (req, res) => {
         role: user.role,
         profilePicture: user.profilePicture || "",
         profilePic: user.profilePicture || "",
+        latitude: user.latitude,
+        longitude: user.longitude,
       },
     });
   } catch (error) {
@@ -113,10 +120,136 @@ router.post("/login", async (req, res) => {
         role: user.role,
         profilePicture: user.profilePicture || "",
         profilePic: user.profilePicture || "",
+        latitude: user.latitude,
+        longitude: user.longitude,
       },
     });
   } catch (error) {
     console.error("Login error:", error);
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+// @route   GET /api/users/profile or /api/auth/profile
+// @desc    Get user profile details including saved latitude and longitude
+// @access  Public / Logged in
+router.get("/profile", async (req, res) => {
+  try {
+    const token = req.headers.authorization ? req.headers.authorization.split(" ")[1] : null;
+    let targetId = req.query.userId || req.query.id || req.query._id;
+
+    if (token && !targetId) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "supersecretkey123");
+        targetId = decoded.id;
+      } catch (err) {
+        // ignore
+      }
+    }
+
+    if (!targetId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const user = await User.findById(targetId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        _id: user._id,
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        profilePicture: user.profilePicture || "",
+        profilePic: user.profilePicture || "",
+        latitude: user.latitude,
+        longitude: user.longitude,
+      },
+    });
+  } catch (error) {
+    console.error("Get profile error:", error);
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+// @route   PUT /api/users/profile or /api/auth/profile
+// @desc    Update user profile details including latitude and longitude
+// @access  Public / Logged in
+router.put("/profile", async (req, res) => {
+  console.log("DEBUG SAVE [1] - Incoming req.body:", req.body);
+
+  try {
+    const token = req.headers.authorization ? req.headers.authorization.split(" ")[1] : null;
+    let decodedId = null;
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "supersecretkey123");
+        decodedId = decoded.id;
+      } catch (err) {
+        // ignore
+      }
+    }
+
+    const { userId, id, _id, fullName, email, latitude, longitude, lat, lng } = req.body;
+    const targetId = userId || id || _id || decodedId;
+
+    if (!targetId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const user = await User.findById(targetId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    console.log("DEBUG SAVE [2] - Found User:", user.email, "Current Lat/Lng:", user.latitude, user.longitude);
+
+    if (fullName) user.fullName = fullName;
+    if (email) user.email = email;
+
+    if (req.body.latitude !== undefined && req.body.latitude !== null) {
+      user.latitude = Number(req.body.latitude);
+    } else if (req.body.lat !== undefined && req.body.lat !== null) {
+      user.latitude = Number(req.body.lat);
+    }
+
+    if (req.body.longitude !== undefined && req.body.longitude !== null) {
+      user.longitude = Number(req.body.longitude);
+    } else if (req.body.lng !== undefined && req.body.lng !== null) {
+      user.longitude = Number(req.body.lng);
+    }
+
+    try {
+      await user.save();
+      console.log("DEBUG SAVE [3] - Successfully Saved Lat/Lng:", user.latitude, user.longitude);
+    } catch (error) {
+      console.error("DEBUG SAVE [ERROR] - MongoDB Save Failed:", error.message);
+      return res.status(500).json({ message: "MongoDB Save Failed: " + error.message });
+    }
+
+    const responseUser = {
+      _id: user._id,
+      id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+      profilePicture: user.profilePicture || "",
+      profilePic: user.profilePicture || "",
+      latitude: user.latitude,
+      longitude: user.longitude,
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: "Location saved successfully",
+      user: responseUser,
+    });
+  } catch (error) {
+    console.error("Profile update error:", error);
     return res.status(500).json({ message: error.message });
   }
 });
@@ -156,6 +289,8 @@ router.post("/update-profile-picture", upload.single("profilePicture"), async (r
       role: updatedUser.role,
       profilePicture: updatedUser.profilePicture,
       profilePic: updatedUser.profilePicture,
+      latitude: updatedUser.latitude,
+      longitude: updatedUser.longitude,
     };
 
     return res.status(200).json({

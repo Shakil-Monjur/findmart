@@ -27,13 +27,14 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
 app.use("/uploads", express.static(uploadsDir));
 
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", authRoutes);
+app.use("/api", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 

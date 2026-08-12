@@ -1,10 +1,10 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 
 const LocationContext = createContext();
 
 export function LocationProvider({ children }) {
   const [locationGranted, setLocationGranted] = useState(false);
-  const [userLocation, setUserLocation] = useState(null);
+  const [userLocation, setUserLocation] = useState({ lat: 23.8103, lng: 90.4125 });
 
   const requestLocation = () => {
     if (navigator.geolocation) {
@@ -27,11 +27,20 @@ export function LocationProvider({ children }) {
     }
   };
 
+  useEffect(() => {
+    requestLocation();
+  }, []);
+
+  const userLat = userLocation?.lat;
+  const userLng = userLocation?.lng;
+
   return (
     <LocationContext.Provider
       value={{
         locationGranted,
         userLocation,
+        userLat,
+        userLng,
         requestLocation,
       }}
     >

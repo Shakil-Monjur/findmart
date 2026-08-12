@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaClock, FaCheckCircle, FaTruck, FaBan, FaSync } from "react-icons/fa";
+import { API_BASE_URL, SERVER_BASE_URL } from "../../services/api";
 import "../../styles/orders.css";
 import "../../styles/shopOwner.css";
 
@@ -14,9 +15,9 @@ function OrdersOwner() {
       return url;
     }
     if (url.startsWith("/")) {
-      return `https://findmart.onrender.com${url}`;
+      return `${SERVER_BASE_URL}${url}`;
     }
-    return `https://findmart.onrender.com/${url}`;
+    return `${SERVER_BASE_URL}/${url}`;
   };
 
   const fetchShopOrders = async () => {
@@ -27,7 +28,7 @@ function OrdersOwner() {
       const user = storedUser ? JSON.parse(storedUser) : null;
       const sellerId = user?._id || user?.id;
 
-      const res = await fetch(`https://findmart.onrender.com/api/orders/shop-orders?sellerId=${sellerId || ""}`, {
+      const res = await fetch(`${API_BASE_URL}/orders/shop-orders?sellerId=${sellerId || ""}`, {
         headers: {
           Authorization: token ? `Bearer ${token}` : "",
           "x-user-id": sellerId || "",
@@ -54,7 +55,7 @@ function OrdersOwner() {
       setUpdatingId(orderId);
       const token = localStorage.getItem("token");
 
-      const res = await fetch(`https://findmart.onrender.com/api/orders/${orderId}/status`, {
+      const res = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
