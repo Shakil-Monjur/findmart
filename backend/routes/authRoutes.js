@@ -8,21 +8,22 @@ const User = require("../models/User");
 
 const router = express.Router();
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, "../uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-// Multer disk storage configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname) || ".jpg";
-    cb(null, "avatar-" + uniqueSuffix + ext);
+// Configure Cloudinary version 2
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Multer Cloudinary storage configuration
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "findmart",
+    allowed_formats: ["jpg", "jpeg", "png", "webp", "gif"],
   },
 });
 
@@ -135,7 +136,7 @@ router.post("/update-profile-picture", upload.single("profilePicture"), async (r
       return res.status(400).json({ message: "No image file uploaded" });
     }
 
-    const imageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+    const imageUrl = req.file.path;
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,

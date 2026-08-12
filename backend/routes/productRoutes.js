@@ -2,6 +2,8 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const Product = require("../models/Product");
 
+const { upload } = require("../middleware/upload");
+
 const router = express.Router();
 
 // Middleware to extract user from JWT token if present
@@ -31,7 +33,7 @@ const authMiddleware = (req, res, next) => {
 // @route   POST /api/products
 // @desc    Create a new product post
 // @access  Private / Logged in
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
   try {
     const { title, description, price, image } = req.body;
     const seller = req.user?.id || req.body.seller || req.body.sellerId;
@@ -44,12 +46,14 @@ router.post("/", authMiddleware, async (req, res) => {
       return res.status(400).json({ message: "Title, description, and price are required" });
     }
 
+    const imageUrl = req.file ? req.file.path : (image || "");
+
     const newProduct = new Product({
       seller,
       title,
       description,
       price: Number(price),
-      image: image || "",
+      image: imageUrl,
     });
 
     const savedProduct = await newProduct.save();
@@ -96,7 +100,7 @@ router.get("/seller/:sellerId", async (req, res) => {
 // @route   PUT /api/products/:id
 // @desc    Allow a seller to edit their post
 // @access  Private
-router.put("/:id", authMiddleware, async (req, res) => {
+router.put("/:id", authMiddleware, upload.single("image"), async (req, res) => {
   try {
     const { title, description, price, image } = req.body;
     const product = await Product.findById(req.params.id);
@@ -108,7 +112,11 @@ router.put("/:id", authMiddleware, async (req, res) => {
     if (title !== undefined) product.title = title;
     if (description !== undefined) product.description = description;
     if (price !== undefined) product.price = Number(price);
-    if (image !== undefined) product.image = image;
+    if (req.file) {
+      product.image = req.file.path;
+    } else if (image !== undefined) {
+      product.image = image;
+    }
 
     const updatedProduct = await product.save();
     const populatedProduct = await updatedProduct.populate("seller", "fullName email role profilePicture");

@@ -87,12 +87,23 @@ function Profile() {
     setTimeout(() => setSuccessMsg(""), 3000);
   };
 
+  const getAvatarUrl = (url) => {
+    if (!url) return defaultAvatar;
+    if (url.startsWith("data:") || url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+    if (url.startsWith("/")) {
+      return `https://findmart.onrender.com${url}`;
+    }
+    return `https://findmart.onrender.com/${url}`;
+  };
+
   return (
     <div className="profile-container">
       <div className="profile-header">
         <div className="profile-avatar-wrapper">
           <img
-            src={previewPic || defaultAvatar}
+            src={getAvatarUrl(previewPic)}
             alt="Profile Preview"
             className="profile-avatar-preview"
           />

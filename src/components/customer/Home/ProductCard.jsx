@@ -48,7 +48,18 @@ function ProductCard({ product }) {
     }
   };
 
-  const imageSrc = product?.image;
+  const getImageUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("data:") || url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+    if (url.startsWith("/")) {
+      return `https://findmart.onrender.com${url}`;
+    }
+    return `https://findmart.onrender.com/${url}`;
+  };
+
+  const imageSrc = getImageUrl(product?.image);
   const title = product?.title || "product photo";
   const sellerName =
     product?.seller?.fullName ||
