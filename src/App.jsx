@@ -38,7 +38,7 @@ import SettingsOwner from "./pages/shopOwner/Settings";
 
 function App() {
   return (
-    <BrowserRouter basename="/findmart">
+    <BrowserRouter>
       <AuthProvider>
         <LocationProvider>
           <SavedProvider>
