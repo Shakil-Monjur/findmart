@@ -1,3 +1,4 @@
+/* global process */
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -34,9 +35,9 @@ app.use("/uploads", express.static(uploadsDir));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", authRoutes);
-app.use("/api", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api", authRoutes);
 
 // Basic test route
 app.get("/", (req, res) => {

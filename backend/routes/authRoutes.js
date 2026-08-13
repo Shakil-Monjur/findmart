@@ -1,8 +1,7 @@
+/* global process */
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const path = require("path");
-const fs = require("fs");
 const multer = require("multer");
 const User = require("../models/User");
 
@@ -142,7 +141,7 @@ router.get("/profile", async (req, res) => {
       try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || "supersecretkey123");
         targetId = decoded.id;
-      } catch (err) {
+      } catch {
         // ignore
       }
     }
@@ -189,12 +188,12 @@ router.put("/profile", async (req, res) => {
       try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || "supersecretkey123");
         decodedId = decoded.id;
-      } catch (err) {
+      } catch {
         // ignore
       }
     }
 
-    const { userId, id, _id, fullName, email, latitude, longitude, lat, lng } = req.body;
+    const { userId, id, _id, fullName, email } = req.body;
     const targetId = userId || id || _id || decodedId;
 
     if (!targetId) {

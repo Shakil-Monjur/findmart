@@ -1,3 +1,4 @@
+/* global process */
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const Product = require("../models/Product");
