@@ -8,7 +8,7 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { user, isShopOwner, logout } = useAuthContext();
+  const { user, isLoggedIn, isShopOwner, logout } = useAuthContext();
   const { cartItems } = useCartContext();
   const totalUniqueItems = cartItems.length;
 
